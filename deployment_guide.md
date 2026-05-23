@@ -32,7 +32,10 @@ Before starting, make sure you have these variables ready:
         *   `GEMINI_API_KEY` = `[Your Google Gemini Key]`
         *   `QDRANT_URL` = `https://0ba45383-f525-46fc-956b-b591c0ee064f.us-west-1-0.aws.cloud.qdrant.io`
         *   `QDRANT_API_KEY` = `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2Nlc3MiOiJtIiwic3ViamVjdCI6ImFwaS1rZXk6MGE1NTcyM2QtOTUxZC00ZjNjLWI2ZGYtZDkyMGI3ZTUwZDkyIn0.EXA0tBqu5T8cTbESmMDATboK5qkDlK5FIBTPb_BWvjk`
-        *   `RESEARCH_ASSISTANT_API_KEY` = `[Your Secure Access Key, e.g., testkey]`
+        *   `JWT_SECRET_KEY` = `[A secure random string for JWT signature]`
+        *   *(Optional)* `FIREBASE_STORAGE_BUCKET` = `[your-project-id].appspot.com`
+        *   *(Optional)* `FIREBASE_SERVICE_ACCOUNT_JSON` = `[Raw content of service account JSON file]`
+        *   *(Optional)* `CELERY_BROKER_URL` = `[Your Redis Broker URL, e.g. redis://...]`
 5.  **Deploy**: Click **Create Web Service**.
     *   Render will build the Docker container and start your FastAPI service.
     *   Once complete, note your public backend URL (e.g., `https://research-assistant-backend.onrender.com`).
