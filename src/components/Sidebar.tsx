@@ -13,15 +13,17 @@ import {
   FileText, 
   BookOpen, 
   Save,
-  Loader2
+  Loader2,
+  Upload
 } from 'lucide-react';
 import type { SystemConfig, DocumentItem } from '../types';
-
+ 
 interface SidebarProps {
   config: SystemConfig | null;
   documents: DocumentItem[];
   loadingDocs: boolean;
   isIndexing: boolean;
+  isUploading: boolean;
   accessKey: string;
   backendUrl: string;
   isUnauthorized: boolean;
@@ -29,14 +31,16 @@ interface SidebarProps {
   onBackendUrlChange: (val: string) => void;
   onSaveConfig: () => void;
   onIngest: () => void;
+  onUploadFile: (file: File) => void;
   onRefreshCatalog: () => void;
 }
-
+ 
 export const Sidebar: React.FC<SidebarProps> = ({
   config,
   documents,
   loadingDocs,
   isIndexing,
+  isUploading,
   accessKey,
   backendUrl,
   isUnauthorized,
@@ -44,6 +48,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onBackendUrlChange,
   onSaveConfig,
   onIngest,
+  onUploadFile,
   onRefreshCatalog
 }) => {
   return (
@@ -196,21 +201,56 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
       {/* Sidebar Footer (Ingestion Trigger) */}
       <div className="p-5 border-t border-border-color bg-bg-surface/50">
-        <button
-          onClick={onIngest}
-          disabled={isIndexing || isUnauthorized}
-          className="w-full bg-gradient-to-r from-accent-secondary to-accent-primary text-bg-base hover:scale-[1.02] active:scale-[0.98] font-bold text-xs py-3 px-4 rounded-xl flex items-center justify-center gap-2 shadow-lg shadow-accent-glow disabled:opacity-50 disabled:pointer-events-none transition-all duration-300"
-        >
-          {isIndexing ? (
-            <>
-              <Loader2 className="w-4 h-4 animate-spin" /> Ingesting & Indexing...
-            </>
-          ) : (
-            <>
-              <Cpu className="w-4 h-4" /> Ingest & Index PDFs
-            </>
-          )}
-        </button>
+        <div className="flex flex-col gap-3">
+          {/* PDF file upload label */}
+          <div>
+            <input
+              type="file"
+              id="pdf-upload-input"
+              accept=".pdf"
+              className="hidden"
+              onChange={(e) => {
+                if (e.target.files && e.target.files[0]) {
+                  onUploadFile(e.target.files[0]);
+                }
+              }}
+              disabled={isUploading || isUnauthorized}
+            />
+            <label
+              htmlFor="pdf-upload-input"
+              className={`w-full bg-gradient-to-r from-accent-secondary to-accent-primary text-bg-base hover:scale-[1.02] active:scale-[0.98] font-bold text-xs py-3.5 px-4 rounded-xl flex items-center justify-center gap-2 shadow-lg shadow-accent-glow cursor-pointer transition-all duration-300 text-center ${
+                (isUploading || isUnauthorized) ? 'opacity-50 pointer-events-none' : ''
+              }`}
+            >
+              {isUploading ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" /> Uploading PDF...
+                </>
+              ) : (
+                <>
+                  <Upload className="w-4 h-4" /> Upload & Index PDF
+                </>
+              )}
+            </label>
+          </div>
+
+          {/* Legacy Bulk scan trigger */}
+          <button
+            onClick={onIngest}
+            disabled={isIndexing || isUploading || isUnauthorized}
+            className="w-full bg-bg-surface-elevated hover:bg-border-color border border-border-color text-text-secondary hover:text-white font-semibold text-[11px] py-2 px-3 rounded-lg flex items-center justify-center gap-1.5 transition-all duration-200"
+          >
+            {isIndexing ? (
+              <>
+                <Loader2 className="w-3.5 h-3.5 animate-spin" /> Scanning local folder...
+              </>
+            ) : (
+              <>
+                <Cpu className="w-3.5 h-3.5" /> Scan backend data/ folder
+              </>
+            )}
+          </button>
+        </div>
       </div>
     </aside>
   );

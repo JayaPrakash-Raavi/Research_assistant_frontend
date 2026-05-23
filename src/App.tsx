@@ -23,6 +23,7 @@ export const App: React.FC = () => {
   const [documents, setDocuments] = useState<DocumentItem[]>([]);
   const [loadingDocs, setLoadingDocs] = useState<boolean>(false);
   const [isIndexing, setIsIndexing] = useState<boolean>(false);
+  const [isUploading, setIsUploading] = useState<boolean>(false);
   const [isUnauthorized, setIsUnauthorized] = useState<boolean>(false);
 
   // Chat/Tracing states
@@ -152,6 +153,50 @@ export const App: React.FC = () => {
     }
   };
 
+  // Upload single PDF handler
+  const handleUploadFile = useCallback(async (file: File) => {
+    if (!file) return;
+    
+    setIsUploading(true);
+    showToast(`Uploading '${file.name}' for background processing...`);
+    
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      
+      const res = await fetch(`${backendUrl}/api/upload`, {
+        method: 'POST',
+        headers: getHeaders(),
+        body: formData
+      });
+      
+      if (res.status === 403) {
+        setIsUnauthorized(true);
+        showToast('Authentication failed. Invalid Access Key.');
+        return;
+      }
+      
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData.detail || 'Upload failed');
+      }
+      
+      const data = await res.json();
+      showToast(data.message || 'File uploaded successfully! Processing...');
+      
+      // Auto-refresh document list after 5 seconds since ingestion runs in background
+      setTimeout(() => {
+        loadDocumentsCatalog();
+      }, 5000);
+      
+    } catch (err: any) {
+      console.error('File upload error:', err);
+      showToast(`Upload failed: ${err.message || 'Server error'}`);
+    } finally {
+      setIsUploading(false);
+    }
+  }, [backendUrl, getHeaders, showToast, loadDocumentsCatalog]);
+
   // Chat message submission
   const handleSendMessage = async (content: string) => {
     const userMsg: ChatMessage = { role: 'user', content };
@@ -231,6 +276,7 @@ export const App: React.FC = () => {
         documents={documents}
         loadingDocs={loadingDocs}
         isIndexing={isIndexing}
+        isUploading={isUploading}
         accessKey={accessKey}
         backendUrl={backendUrl}
         isUnauthorized={isUnauthorized}
@@ -238,6 +284,7 @@ export const App: React.FC = () => {
         onBackendUrlChange={setBackendUrl}
         onSaveConfig={handleSaveConfig}
         onIngest={handleIngest}
+        onUploadFile={handleUploadFile}
         onRefreshCatalog={loadDocumentsCatalog}
       />
 
