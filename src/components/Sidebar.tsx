@@ -93,7 +93,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </div>
 
         {/* Security Credentials Section */}
-        {(!config || config.app_api_key_configured) && (
+        {!import.meta.env.VITE_API_URL && (!config || config.app_api_key_configured) && (
           <div className="p-5 flex flex-col gap-3">
             <h3 className="text-xs uppercase tracking-widest text-text-secondary font-semibold">Security Settings</h3>
             <div className="bg-bg-surface border border-border-color rounded-xl p-3.5 flex flex-col gap-3">
