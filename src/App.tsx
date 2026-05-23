@@ -11,10 +11,12 @@ export const App: React.FC = () => {
   
   // Storage settings state
   const [accessKey, setAccessKey] = useState<string>(() => {
-    return localStorage.getItem('research_assistant_api_key') || '';
+    return localStorage.getItem('research_assistant_api_key') || 
+           (import.meta.env.VITE_ACCESS_KEY as string) || '';
   });
   const [backendUrl, setBackendUrl] = useState<string>(() => {
-    return localStorage.getItem('research_assistant_backend_url') || 'http://localhost:8000';
+    return localStorage.getItem('research_assistant_backend_url') || 
+           (import.meta.env.VITE_API_URL as string) || 'http://localhost:8000';
   });
 
   // Data list states
