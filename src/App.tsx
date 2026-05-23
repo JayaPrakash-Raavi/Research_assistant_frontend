@@ -3,6 +3,7 @@ import { Sidebar } from './components/Sidebar';
 import { ChatArea } from './components/ChatArea';
 import { ObservabilityTrace } from './components/ObservabilityTrace';
 import { Toast } from './components/ui/Toast';
+import { Auth } from './components/Auth';
 import type { SystemConfig, DocumentItem, ChatMessage, RetrievalChunk } from './types';
 
 export const App: React.FC = () => {
@@ -17,6 +18,11 @@ export const App: React.FC = () => {
   const [backendUrl, setBackendUrl] = useState<string>(() => {
     return localStorage.getItem('research_assistant_backend_url') || 
            (import.meta.env.VITE_API_URL as string) || 'http://localhost:8000';
+  });
+
+  // User authentication JWT token state
+  const [jwtToken, setJwtToken] = useState<string>(() => {
+    return localStorage.getItem('research_assistant_jwt') || '';
   });
 
   // Data list states
@@ -45,11 +51,13 @@ export const App: React.FC = () => {
   // Request headers helper
   const getHeaders = useCallback((extra = {}) => {
     const headers: Record<string, string> = { ...extra };
-    if (accessKey.trim()) {
+    if (jwtToken.trim()) {
+      headers['Authorization'] = `Bearer ${jwtToken.trim()}`;
+    } else if (accessKey.trim()) {
       headers['X-API-KEY'] = accessKey.trim();
     }
     return headers;
-  }, [accessKey]);
+  }, [jwtToken, accessKey]);
 
   // Check system config from backend
   const checkSystemConfig = useCallback(async () => {
@@ -268,6 +276,26 @@ export const App: React.FC = () => {
     }, 2500);
   };
 
+  if (!jwtToken) {
+    return (
+      <>
+        <Auth
+          backendUrl={backendUrl}
+          onLoginSuccess={(token) => {
+            setJwtToken(token);
+            localStorage.setItem('research_assistant_jwt', token);
+          }}
+          showToast={showToast}
+        />
+        <Toast
+          message={toastMessage}
+          visible={toastVisible}
+          onClose={() => setToastVisible(false)}
+        />
+      </>
+    );
+  }
+
   return (
     <div className="flex h-screen w-screen overflow-hidden bg-bg-base text-text-primary">
       {/* Sidebar - System status and inputs */}
@@ -286,6 +314,13 @@ export const App: React.FC = () => {
         onIngest={handleIngest}
         onUploadFile={handleUploadFile}
         onRefreshCatalog={loadDocumentsCatalog}
+        onLogout={() => {
+          setJwtToken('');
+          localStorage.removeItem('research_assistant_jwt');
+          setDocuments([]);
+          setChatMessages([]);
+          setRetrievedChunks([]);
+        }}
       />
 
       {/* Main Content Area */}

@@ -14,7 +14,8 @@ import {
   BookOpen, 
   Save,
   Loader2,
-  Upload
+  Upload,
+  LogOut
 } from 'lucide-react';
 import type { SystemConfig, DocumentItem } from '../types';
  
@@ -33,6 +34,7 @@ interface SidebarProps {
   onIngest: () => void;
   onUploadFile: (file: File) => void;
   onRefreshCatalog: () => void;
+  onLogout?: () => void;
 }
  
 export const Sidebar: React.FC<SidebarProps> = ({
@@ -49,18 +51,30 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onSaveConfig,
   onIngest,
   onUploadFile,
-  onRefreshCatalog
+  onRefreshCatalog,
+  onLogout
 }) => {
   return (
     <aside className="glass-panel w-[320px] flex flex-col h-full shrink-0 border-r border-border-color bg-bg-glass backdrop-blur-md">
       {/* Brand */}
-      <div className="p-6 flex items-center gap-3 border-bottom border-border-color border-b">
-        <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-accent-secondary to-accent-primary flex items-center justify-center shadow-lg shadow-accent-glow">
-          <Cpu className="w-5 h-5 text-white" />
+      <div className="p-6 flex items-center justify-between border-b border-border-color">
+        <div className="flex items-center gap-3">
+          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-accent-secondary to-accent-primary flex items-center justify-center shadow-lg shadow-accent-glow">
+            <Cpu className="w-5 h-5 text-white" />
+          </div>
+          <h1 className="text-xl font-bold tracking-tight text-white">
+            Researches<span className="bg-gradient-to-r from-accent-secondary to-accent-primary bg-clip-text text-transparent">AI</span>
+          </h1>
         </div>
-        <h1 className="text-xl font-bold tracking-tight text-white">
-          Researches<span className="bg-gradient-to-r from-accent-secondary to-accent-primary bg-clip-text text-transparent">AI</span>
-        </h1>
+        {onLogout && (
+          <button
+            onClick={onLogout}
+            title="Log Out"
+            className="p-1.5 hover:bg-border-color/40 border border-transparent hover:border-border-color rounded-xl text-text-secondary hover:text-red-400 active:scale-95 transition-all duration-200"
+          >
+            <LogOut className="w-4 h-4" />
+          </button>
+        )}
       </div>
 
       {/* Sidebar sections container */}
