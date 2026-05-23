@@ -102,8 +102,10 @@ export const App: React.FC = () => {
   // Initial load
   useEffect(() => {
     checkSystemConfig();
-    loadDocumentsCatalog();
-  }, [checkSystemConfig, loadDocumentsCatalog]);
+    if (jwtToken) {
+      loadDocumentsCatalog();
+    }
+  }, [checkSystemConfig, loadDocumentsCatalog, jwtToken]);
 
   // Save Settings handler
   const handleSaveConfig = () => {
@@ -122,7 +124,9 @@ export const App: React.FC = () => {
     // Trigger refresh immediately
     setTimeout(() => {
       checkSystemConfig();
-      loadDocumentsCatalog();
+      if (jwtToken) {
+        loadDocumentsCatalog();
+      }
     }, 100);
   };
 
