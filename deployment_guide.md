@@ -51,18 +51,18 @@ Before starting, make sure you have these variables ready:
     *   **Framework Preset**: Select `Vite`.
     *   **Build Command**: `npm run build`
     *   **Output Directory**: `dist`
+    *   **Environment Variables** (Optional, for Zero-Config load):
+        *   Add `VITE_API_URL` = `https://research-assistant-backend-ogdd.onrender.com` (your Render backend URL).
+        *   Add `VITE_ACCESS_KEY` = `[your access key value, e.g., testkey]`.
 4.  **Deploy**: Click **Deploy**.
-    *   Vercel will compile the React bundle and deploy the app statically.
-    *   Once done, click on the visit link to open your live dashboard interface.
+    *   Vercel will compile the React bundle injecting these default environment variables and deploy the app statically.
+    *   Once complete, your site will load and connect automatically to your Render backend without needing any manual configuration!
 
 ---
 
-## 4. Connecting Frontend and Backend
-Once both services are live:
-
-1.  Open your Vercel website URL (e.g., `https://research-assistant-frontend.vercel.app`).
-2.  In the left sidebar under **Security Settings**, configure:
-    *   **Backend API URL**: Paste your live Render backend URL (e.g., `https://research-assistant-backend.onrender.com`).
-    *   **Access Key (X-API-KEY)**: Paste your `RESEARCH_ASSISTANT_API_KEY` value.
-    *   Click the **Save Settings** (floppy disk) icon.
-3.  The client app will check connectivity, authorize, load the cloud Qdrant documents catalog, and start accepting queries!
+## 4. Dynamic Connection Overrides
+Even if you configured your backend URL during the build stage, you can still manually configure or override settings in the browser at any time:
+1.  Open your Vercel website URL.
+2.  Expand **Security Settings** in the left panel.
+3.  Enter a different Backend API URL or Access Key.
+4.  Click the **Save Settings** (floppy disk) icon to override and save to your browser's local storage.
