@@ -131,11 +131,11 @@ export const App: React.FC = () => {
   };
 
   // Document indexing/ingesting trigger
-  const handleIngest = async () => {
+  const handleIngest = async (force: boolean = false) => {
     setIsIndexing(true);
-    showToast('Ingesting documents from data/ ...');
+    showToast(force ? 'Re-vectorizing documents from data/ ...' : 'Ingesting documents from data/ ...');
     try {
-      const response = await fetch(`${backendUrl}/api/index`, {
+      const response = await fetch(`${backendUrl}/api/index?force=${force}`, {
         method: 'POST',
         headers: getHeaders()
       });
@@ -166,7 +166,7 @@ export const App: React.FC = () => {
   };
 
   // Upload single PDF handler
-  const handleUploadFile = useCallback(async (file: File) => {
+  const handleUploadFile = useCallback(async (file: File, force: boolean = false) => {
     if (!file) return;
     
     setIsUploading(true);
@@ -176,7 +176,7 @@ export const App: React.FC = () => {
       const formData = new FormData();
       formData.append('file', file);
       
-      const res = await fetch(`${backendUrl}/api/upload`, {
+      const res = await fetch(`${backendUrl}/api/upload?force=${force}`, {
         method: 'POST',
         headers: getHeaders(),
         body: formData

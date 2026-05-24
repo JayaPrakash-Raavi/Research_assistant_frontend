@@ -32,8 +32,8 @@ interface SidebarProps {
   onAccessKeyChange: (val: string) => void;
   onBackendUrlChange: (val: string) => void;
   onSaveConfig: () => void;
-  onIngest: () => void;
-  onUploadFile: (file: File) => void;
+  onIngest: (force: boolean) => void;
+  onUploadFile: (file: File, force: boolean) => void;
   onRefreshCatalog: () => void;
   onLogout?: () => void;
   onDeleteDocument?: (filename: string) => void;
@@ -57,6 +57,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onLogout,
   onDeleteDocument
 }) => {
+  const [forceReindex, setForceReindex] = React.useState(false);
   return (
     <aside className="glass-panel w-[320px] flex flex-col h-full shrink-0 border-r border-border-color bg-bg-glass backdrop-blur-md">
       {/* Brand */}
@@ -230,6 +231,20 @@ export const Sidebar: React.FC<SidebarProps> = ({
       {/* Sidebar Footer (Ingestion Trigger) */}
       <div className="p-5 border-t border-border-color bg-bg-surface/50">
         <div className="flex flex-col gap-3">
+          {/* Overwrite checkbox */}
+          <div className="flex items-center gap-2.5 pb-1 text-[11px] text-text-secondary select-none">
+            <input
+              type="checkbox"
+              id="force-reindex-checkbox"
+              checked={forceReindex}
+              onChange={(e) => setForceReindex(e.target.checked)}
+              className="accent-accent-primary w-3.5 h-3.5 rounded border-border-color cursor-pointer bg-bg-surface bg-no-repeat bg-center bg-contain border border-border-color checked:bg-accent-primary checked:border-transparent focus:outline-none"
+            />
+            <label htmlFor="force-reindex-checkbox" className="cursor-pointer hover:text-white transition-colors duration-150">
+              Overwrite existing vectors (Re-vectorize)
+            </label>
+          </div>
+
           {/* PDF file upload label */}
           <div>
             <input
@@ -239,7 +254,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               className="hidden"
               onChange={(e) => {
                 if (e.target.files && e.target.files[0]) {
-                  onUploadFile(e.target.files[0]);
+                  onUploadFile(e.target.files[0], forceReindex);
                 }
               }}
               disabled={isUploading || isUnauthorized}
@@ -264,7 +279,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
           {/* Legacy Bulk scan trigger */}
           <button
-            onClick={onIngest}
+            onClick={() => onIngest(forceReindex)}
             disabled={isIndexing || isUploading || isUnauthorized}
             className="w-full bg-bg-surface-elevated hover:bg-border-color border border-border-color text-text-secondary hover:text-white font-semibold text-[11px] py-2 px-3 rounded-lg flex items-center justify-center gap-1.5 transition-all duration-200"
           >
