@@ -15,7 +15,8 @@ import {
   Save,
   Loader2,
   Upload,
-  LogOut
+  LogOut,
+  Trash2
 } from 'lucide-react';
 import type { SystemConfig, DocumentItem } from '../types';
  
@@ -35,6 +36,7 @@ interface SidebarProps {
   onUploadFile: (file: File) => void;
   onRefreshCatalog: () => void;
   onLogout?: () => void;
+  onDeleteDocument?: (filename: string) => void;
 }
  
 export const Sidebar: React.FC<SidebarProps> = ({
@@ -52,7 +54,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onIngest,
   onUploadFile,
   onRefreshCatalog,
-  onLogout
+  onLogout,
+  onDeleteDocument
 }) => {
   return (
     <aside className="glass-panel w-[320px] flex flex-col h-full shrink-0 border-r border-border-color bg-bg-glass backdrop-blur-md">
@@ -189,22 +192,33 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 {documents.map((doc, idx) => (
                   <div
                     key={idx}
-                    className="group bg-bg-surface border border-border-color hover:border-border-highlight rounded-xl p-3 flex gap-3 transition-all duration-300 transform hover:-translate-y-[1px]"
+                    className="group bg-bg-surface border border-border-color hover:border-border-highlight rounded-xl p-3 flex items-start justify-between gap-3 transition-all duration-300 transform hover:-translate-y-[1px]"
                   >
-                    <FileText className="w-5 h-5 text-accent-secondary shrink-0 mt-0.5" />
-                    <div className="flex-1 min-w-0">
-                      <div className="text-xs font-semibold text-white truncate" title={doc.filename}>
-                        {doc.filename}
-                      </div>
-                      <div className="flex gap-3 text-[10px] text-text-secondary mt-1">
-                        <span className="flex items-center gap-1">
-                          <BookOpen className="w-3 h-3 text-text-muted" /> {doc.pages_count} pages
-                        </span>
-                        <span className="flex items-center gap-1">
-                          <Database className="w-3 h-3 text-text-muted" /> {doc.chunks_count} chunks
-                        </span>
+                    <div className="flex gap-3 min-w-0 flex-1">
+                      <FileText className="w-5 h-5 text-accent-secondary shrink-0 mt-0.5" />
+                      <div className="flex-1 min-w-0">
+                        <div className="text-xs font-semibold text-white truncate" title={doc.filename}>
+                          {doc.filename}
+                        </div>
+                        <div className="flex gap-3 text-[10px] text-text-secondary mt-1">
+                          <span className="flex items-center gap-1">
+                            <BookOpen className="w-3 h-3 text-text-muted" /> {doc.pages_count} pages
+                          </span>
+                          <span className="flex items-center gap-1">
+                            <Database className="w-3 h-3 text-text-muted" /> {doc.chunks_count} chunks
+                          </span>
+                        </div>
                       </div>
                     </div>
+                    {onDeleteDocument && (
+                      <button
+                        onClick={() => onDeleteDocument(doc.filename)}
+                        title="Delete Document"
+                        className="p-1.5 text-text-secondary hover:text-red-400 hover:bg-border-color/30 border border-transparent hover:border-border-color rounded-lg opacity-0 group-hover:opacity-100 transition-all duration-200 shrink-0 self-center"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    )}
                   </div>
                 ))}
               </div>

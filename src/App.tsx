@@ -261,6 +261,31 @@ export const App: React.FC = () => {
     }
   };
 
+  // Delete document handler
+  const handleDeleteDocument = async (filename: string) => {
+    if (!window.confirm(`Are you sure you want to delete "${filename}"? This will remove all its vector embeddings and storage files.`)) {
+      return;
+    }
+    
+    showToast(`Deleting "${filename}"...`);
+    try {
+      const response = await fetch(`${backendUrl}/api/documents?filename=${encodeURIComponent(filename)}`, {
+        method: 'DELETE',
+        headers: getHeaders()
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to delete document');
+      }
+      
+      showToast(`Document "${filename}" deleted successfully.`);
+      loadDocumentsCatalog();
+    } catch (err) {
+      console.error('Error deleting document:', err);
+      showToast('Error deleting document from catalog.');
+    }
+  };
+
   // Clear chat
   const handleClearChat = () => {
     setChatMessages([]);
@@ -318,6 +343,7 @@ export const App: React.FC = () => {
         onIngest={handleIngest}
         onUploadFile={handleUploadFile}
         onRefreshCatalog={loadDocumentsCatalog}
+        onDeleteDocument={handleDeleteDocument}
         onLogout={() => {
           setJwtToken('');
           localStorage.removeItem('research_assistant_jwt');
