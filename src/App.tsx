@@ -152,8 +152,17 @@ export const App: React.FC = () => {
 
       const result = await response.json();
       if (result.status === 'success') {
-        showToast(`Success! Indexed ${result.total_chunks} chunks across ${result.indexed_files.length} PDFs.`);
-        loadDocumentsCatalog();
+        showToast(result.message || 'Bulk indexing started in the background. You can close this tab safely.');
+        
+        // Auto-refresh document list periodically since ingestion runs in background
+        let refreshCount = 0;
+        const intervalId = setInterval(() => {
+          loadDocumentsCatalog();
+          refreshCount++;
+          if (refreshCount >= 12) {
+            clearInterval(intervalId);
+          }
+        }, 5000);
       } else {
         showToast(result.message || 'Indexing completed with warnings.');
       }
